@@ -1,6 +1,10 @@
 server:
     port: 8082
 spring:
+    profile:  #-- By this in github the application-prod.yml file will pick up and run it
+        active: default
+    config:
+        import: optional:configserver:http://localhost:8085
     application:
         name: HOTEL-SERVICE
     datasource:
@@ -18,11 +22,11 @@ spring:
                 dialect: org.hibernate.dialect.MySQL8Dialect
         show-sql: true
 
-eureka:
-    client:
-        fetch-registry: true
-        register-with-eureka: true
-        serviceUrl:
-            defaultZone: http://localhost:8761/eureka
-    instance:
-        preferIpAddress: true
+#eureka:
+#    client:
+#        fetch-registry: true
+#        register-with-eureka: true
+#        serviceUrl:
+#            defaultZone: http://localhost:8761/eureka
+#    instance:
+#        preferIpAddress: true
