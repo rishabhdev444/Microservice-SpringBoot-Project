@@ -23,6 +23,35 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
 
+resilience4j:
+  retry:
+    instances:
+      ratingHotelService:
+        wait-duration: 5s
+        max-attempts: '3'
+  circuitbreaker:
+    instances:
+      ratingHotelBreaker:
+        permittedNumberOfCallsInHalfOpenState: '3'
+        registerHealthIndicator: 'true'
+        minimumNumberOfCalls: '5'
+        slidingWindowSize: '10'
+        eventConsumerBufferSize: '10'
+        failureRateThreshold: '50'
+        slidingWindowType: COUNT_BASED
+        waitDurationInOpenState: 6s
+        automaticTransitionFromOpenToHalfOpenEnabled: 'true'
+management:
+  health:
+    circuitbreakers:
+      enabled: 'true'
+  endpoints:
+    web:
+      exposure:
+        include[]: health
+  endpoint:
+    health:
+      showDetails: always
 
 #eureka:
 #  client:
