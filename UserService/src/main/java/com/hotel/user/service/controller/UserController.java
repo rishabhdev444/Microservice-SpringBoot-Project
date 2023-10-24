@@ -31,7 +31,7 @@ public class UserController {
     @GetMapping("/{userId}")
 //    @CircuitBreaker(name="ratingHotelBreaker",fallbackMethod = "ratingHotelFallback")  //is used when a service is down
 //    @Retry(name="ratingHotelService",fallbackMethod = "ratingHotelFallback")  // Used for to check the service is up or not, or it is slow
-    @RateLimiter(name="userRateLimiter",fallbackMethod = "ratingHotelFallback")
+//    @RateLimiter(name="userRateLimiter",fallbackMethod = "ratingHotelFallback")
     public ResponseEntity<User> getUser(@PathVariable String userId){
         LOGGER.info("Get Single User Handler: UserController");
 //        LOGGER.info("Retry Count : {}",retryCount);  //RetryCount

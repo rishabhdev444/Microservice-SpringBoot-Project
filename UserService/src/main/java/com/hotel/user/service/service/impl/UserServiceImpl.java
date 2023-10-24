@@ -59,6 +59,26 @@ public class UserServiceImpl implements UserService {
 
     //Using Rest Template
 
+    @Override
+    public User getUser(String userId) {
+        User user= userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("User with given id is not valid!! : "+userId));
+        Rating[] ratingOfUser=restTemplate.getForObject("http://RATING-SERVICE/ratings/users/"+user.getUserId(), Rating[].class);
+
+        List<Rating> ratings=Arrays.stream(ratingOfUser).toList();
+        LOGGER.info("Ratings of Users : {}",ratings.stream().map(rating-> rating.getRating()));
+        List<Rating> ratingList=ratings.stream().map(rating->{
+            ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+rating.getHotelId(), Hotel.class);
+            Hotel hotel=forEntity.getBody();
+            LOGGER.info(String.format("Hotel Response Status Code -> %s",forEntity.getStatusCode()));
+            LOGGER.info(String.format("Hotel -> %s",hotel.getName()));
+            rating.setHotel(hotel);
+            return rating;}).collect(Collectors.toList());
+        user.setRatings(ratingList);
+        return user;
+    }
+
+
+    //Using FeignClient
 //    @Override
 //    public User getUser(String userId) {
 //        User user= userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("User with given id is not valid!! : "+userId));
@@ -67,31 +87,11 @@ public class UserServiceImpl implements UserService {
 //        List<Rating> ratings=Arrays.stream(ratingOfUser).toList();
 //        LOGGER.info("{}",ratings);
 //        List<Rating> ratingList=ratings.stream().map(rating->{
-//            ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+rating.getHotelId(), Hotel.class);
-//            Hotel hotel=forEntity.getBody();
-//            LOGGER.info(String.format("Hotel Response Status Code -> %s",forEntity.getStatusCode()));
-//
+////            ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+rating.getHotelId(), Hotel.class);
+//            Hotel hotel=hotelService.getHotel(rating.getHotelId());
 //            rating.setHotel(hotel);
 //            return rating;}).collect(Collectors.toList());
 //        user.setRatings(ratingList);
 //        return user;
 //    }
-
-
-    //Using FeignClient
-    @Override
-    public User getUser(String userId) {
-        User user= userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("User with given id is not valid!! : "+userId));
-        Rating[] ratingOfUser=restTemplate.getForObject("http://RATING-SERVICE/ratings/users/"+user.getUserId(), Rating[].class);
-
-        List<Rating> ratings=Arrays.stream(ratingOfUser).toList();
-        LOGGER.info("{}",ratings);
-        List<Rating> ratingList=ratings.stream().map(rating->{
-//            ResponseEntity<Hotel> forEntity=restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+rating.getHotelId(), Hotel.class);
-            Hotel hotel=hotelService.getHotel(rating.getHotelId());
-            rating.setHotel(hotel);
-            return rating;}).collect(Collectors.toList());
-        user.setRatings(ratingList);
-        return user;
-    }
 }
