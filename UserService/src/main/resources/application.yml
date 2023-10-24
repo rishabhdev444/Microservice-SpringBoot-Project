@@ -24,6 +24,12 @@ spring:
     show-sql: true
 
 resilience4j:
+  ratelimiter:
+    instances:
+      userRateLimiter:
+        limitForPeriod: '2'
+        timeout-duration: 0s
+        limitRefreshPeriod: 4s
   retry:
     instances:
       ratingHotelService:

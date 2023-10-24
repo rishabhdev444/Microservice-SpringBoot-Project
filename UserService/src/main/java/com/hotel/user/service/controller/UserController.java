@@ -4,6 +4,7 @@ import com.hotel.user.service.entities.User;
 import com.hotel.user.service.service.UserService;
 import com.hotel.user.service.service.impl.UserServiceImpl;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +29,9 @@ public class UserController {
     }
 //    int retryCount=1; //to check the retyrCount after the rating service is down
     @GetMapping("/{userId}")
-    @CircuitBreaker(name="ratingHotelBreaker",fallbackMethod = "ratingHotelFallback")  //is used when a service is down
+//    @CircuitBreaker(name="ratingHotelBreaker",fallbackMethod = "ratingHotelFallback")  //is used when a service is down
 //    @Retry(name="ratingHotelService",fallbackMethod = "ratingHotelFallback")  // Used for to check the service is up or not, or it is slow
+    @RateLimiter(name="userRateLimiter",fallbackMethod = "ratingHotelFallback")
     public ResponseEntity<User> getUser(@PathVariable String userId){
         LOGGER.info("Get Single User Handler: UserController");
 //        LOGGER.info("Retry Count : {}",retryCount);  //RetryCount
